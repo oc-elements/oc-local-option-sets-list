@@ -21,8 +21,9 @@ Element for listing local options in a grid
     <oc-option-sets-list
             items="[[ _items ]]"
             total-items="[[ _totalItems ]]"
+            page-size="[[ _pageSize ]]"
             current-page="[[ _currentPage ]]"
-            on-page-request="_onPageChanged"
+            on-async-page-request="_onPageRequest"
     ></oc-option-sets-list>
   </template>
 
@@ -49,8 +50,8 @@ Element for listing local options in a grid
         this._getOptionSets(1, 10);
       },
 
-      _onPageChanged: function(event) {
-        //this._getOptionSets(1, 10);
+      _onPageRequest: function(event) {
+        this._getOptionSets(event.detail.page, event.detail.range);
       },
 
       _getOptionSets(page, pageSize) {
@@ -58,12 +59,12 @@ Element for listing local options in a grid
                 .then(function(request) {
                   this._items = request.response.results;
                   this._totalItems = request.response.count;
-                  this._currentPage = 1;
+                  this._currentPage = page;
+                  this._pageSize = pageSize;
                 }.bind(this))
                 .catch(this.fire.bind(this, 'option-set-error', 'Failed to load option sets'))
                 .finally(this.set.bind(this, 'loading', false));
       }
-
     });
   </script>
 </dom-module>
